@@ -6,6 +6,8 @@ A top-down wave-based zombie survival shooter built with vanilla **HTML5 Canvas*
 
 ## 🎮 Play Directly in Your Browser
 
+🔗 **Live Game:** **[https://akulsun.github.io/holdout/](https://akulsun.github.io/holdout/)**
+
 - **Zero dependencies & no build step**: Open the website in any modern web browser (Chrome, Firefox, Edge, Safari, Brave) to play instantly.
 - **Audio out of the box**: All sound effects (gunfire, reloads, impacts, zombie roars) are synthesized on the fly via the Web Audio API—no external audio files or assets needed.
 
