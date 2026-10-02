@@ -407,6 +407,19 @@
       overflow: auto
     }
 
+    .menu-ver {
+      position: fixed;
+      right: 18px;
+      bottom: 16px;
+      font-family: var(--font-num);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      color: var(--ink-faint);
+      pointer-events: none;
+      user-select: none;
+    }
+
     .card {
       background: var(--panel-solid);
       border: 1px solid var(--line);
@@ -927,16 +940,24 @@
       </div>
       <p class="note" id="touch-note"></p>
     </div>
+    <div class="menu-ver">v1.1</div>
   </div>
 
   <!-- Pause -->
   <div class="overlay hidden" id="pause">
-    <div class="card" style="width:min(380px,100%)">
+    <div class="card" style="width:min(440px,100%)">
       <h2>Paused</h2>
-      <div class="row" style="margin-top:20px">
+      <div class="stats" id="pause-stats" style="margin:16px 0"></div>
+      <label class="field" style="margin-bottom:14px">
+        <span>Name for leaderboard</span>
+        <input type="text" id="pause-name" maxlength="16" placeholder="Survivor" autocomplete="off">
+      </label>
+      <div class="row">
         <button class="btn primary" data-act="resume">Resume</button>
-        <button class="btn" data-act="quit">Quit to menu</button>
+        <button class="btn" data-act="submit-pause" id="pause-submit-btn">Stop & Submit Run</button>
+        <button class="btn" data-act="quit">Quit</button>
       </div>
+      <div class="status" id="pause-submit-status"></div>
     </div>
   </div>
 
@@ -1294,11 +1315,11 @@
        ===================================================================== */
     const WEAPON_ORDER = ['pistol', 'smg', 'shotgun', 'rifle', 'lmg'];
     const WEAPONS = {
-      pistol: { name: 'P-11 Pistol', short: 'Pistol', price: 0, auto: false, dmg: 25, interval: .26, mag: 10, resMult: 6, reload: 1.2, spread: .025, pellets: 1, bspeed: 1500, range: 720, up: 300, ammoCost: 100, kick: 3, shake: 1.2, len: 14, gw: 4, color: '#2b2d2c', snd: 'pistol', desc: 'Reliable sidearm. Cheap to upgrade.' },
-      smg: { name: 'Viper SMG', short: 'SMG', price: 1000, auto: true, dmg: 19, interval: .075, mag: 32, resMult: 6, reload: 1.7, spread: .07, pellets: 1, bspeed: 1500, range: 640, up: 500, ammoCost: 200, kick: 2, shake: 1, len: 22, gw: 5, color: '#2a2c2b', snd: 'smg', desc: 'Fast automatic fire, great against runners.' },
-      shotgun: { name: 'Breaker Shotgun', short: 'Shotgun', price: 1500, auto: false, dmg: 12, interval: .85, mag: 6, resMult: 7, reload: 2.3, spread: .2, pellets: 8, bspeed: 1400, range: 380, up: 600, ammoCost: 250, kick: 6, shake: 5, len: 30, gw: 5, color: '#3b3632', snd: 'shotgun', desc: 'Devastating up close. Fires eight pellets.' },
-      rifle: { name: 'Ranger Rifle', short: 'Rifle', price: 2500, auto: true, dmg: 34, interval: .11, mag: 30, resMult: 6, reload: 2.0, spread: .035, pellets: 1, bspeed: 1900, range: 1100, up: 800, ammoCost: 350, kick: 3, shake: 1.8, len: 34, gw: 5, color: '#2d302b', snd: 'rifle', desc: 'Accurate, hard-hitting automatic rifle.' },
-      lmg: { name: 'Anvil LMG', short: 'LMG', price: 4000, auto: true, dmg: 30, interval: .07, mag: 100, resMult: 4, reload: 4.0, spread: .06, pellets: 1, bspeed: 1800, range: 1000, up: 1000, ammoCost: 500, kick: 3, shake: 2, len: 38, gw: 7, color: '#2a2d2e', snd: 'lmg', desc: 'Huge magazine. Slow to reload, hard to stop.' }
+      pistol: { name: 'P-11 Pistol', short: 'Pistol', price: 0, auto: false, dmg: 25, interval: .26, mag: 10, resMult: 6, reload: 1.2, spread: .025, pellets: 1, bspeed: 1500, range: 720, up: 300, ammoCost: 100, kick: 4, shake: 3.5, len: 14, gw: 4, color: '#2b2d2c', snd: 'pistol', desc: 'Reliable sidearm. Cheap to upgrade.' },
+      smg: { name: 'Viper SMG', short: 'SMG', price: 1000, auto: true, dmg: 19, interval: .075, mag: 32, resMult: 6, reload: 1.7, spread: .07, pellets: 1, bspeed: 1500, range: 640, up: 500, ammoCost: 200, kick: 2.5, shake: 2.2, len: 22, gw: 5, color: '#2a2c2b', snd: 'smg', desc: 'Fast automatic fire, great against runners.' },
+      shotgun: { name: 'Breaker Shotgun', short: 'Shotgun', price: 1500, auto: false, dmg: 12, interval: .85, mag: 6, resMult: 7, reload: 2.3, spread: .2, pellets: 8, bspeed: 1400, range: 380, up: 600, ammoCost: 250, kick: 9, shake: 9.5, len: 30, gw: 5, color: '#3b3632', snd: 'shotgun', desc: 'Devastating up close. Fires eight pellets.' },
+      rifle: { name: 'Ranger Rifle', short: 'Rifle', price: 2500, auto: true, dmg: 34, interval: .11, mag: 30, resMult: 6, reload: 2.0, spread: .035, pellets: 1, bspeed: 1900, range: 1100, up: 800, ammoCost: 350, kick: 4.5, shake: 4.2, len: 34, gw: 5, color: '#2d302b', snd: 'rifle', desc: 'Accurate, hard-hitting automatic rifle.' },
+      lmg: { name: 'Anvil LMG', short: 'LMG', price: 4000, auto: true, dmg: 30, interval: .07, mag: 100, resMult: 4, reload: 4.0, spread: .06, pellets: 1, bspeed: 1800, range: 1000, up: 1000, ammoCost: 500, kick: 5, shake: 5.0, len: 38, gw: 7, color: '#2a2d2e', snd: 'lmg', desc: 'Huge magazine. Slow to reload, hard to stop.' }
     };
     const TRACKS = [
       { id: 'dmg', label: 'Damage' },
@@ -1362,7 +1383,7 @@
     let P = null;
     let Wv = null;                       // current wave
     const zombies = [], bullets = [], pickups = [], parts = [], popups = [];
-    const cam = { x: 0, y: 0 };
+    const cam = { x: 0, y: 0, rx: 0, ry: 0 };
     const mouse = { x: 0, y: 0, down: false, queued: 0 };
     const keys = {};
     const shop = { sel: 'pistol' };
@@ -1383,6 +1404,7 @@
       };
       shop.sel = 'pistol';
       cam.x = P.x - vw / zoom / 2; cam.y = P.y - vh / zoom / 2;
+      cam.rx = 0; cam.ry = 0;
       startWave(1);
     }
 
@@ -1427,7 +1449,7 @@
     }
     function endWave() {
       G.mode = 'intermission';
-      G.waveDelay = 3.0;
+      G.waveDelay = 3.5;
       const bonus = Wv.n * 100;
       P.points += bonus; G.score += bonus;
       showBanner('Wave ' + Wv.n + ' cleared', '+' + fmt(bonus) + ' bonus points');
@@ -1468,13 +1490,33 @@
         const sp = def.bspeed * rand(.95, 1.05);
         bullets.push({ x: ox, y: oy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: s.dmg, life: def.range / def.bspeed });
       }
-      P.kick = def.kick; P.flash = .05; G.shake = Math.min(10, G.shake + def.shake);
+      P.kick = def.kick; P.flash = .05;
+      G.shake = Math.min(24, (G.shake || 0) + def.shake);
+      const rk = def.kick * 1.5;
+      cam.rx = (cam.rx || 0) - Math.cos(P.angle) * rk;
+      cam.ry = (cam.ry || 0) - Math.sin(P.angle) * rk;
       Snd.shot(def.snd);
       if (w.ammo === 0 && w.reserve > 0) startReload();
     }
-    function hurtPlayer(d) {
-      P.hp -= d; P.lastHit = G.time; G.shake = Math.min(12, G.shake + 5); G.dmgFlash = 1; Snd.hurt();
-      for (let i = 0; i < 6; i++) spawnPart(P.x, P.y, rand(0, TAU), rand(40, 160), rand(.25, .5), rand(1.5, 3), 'blood');
+    function hurtPlayer(d, z) {
+      if (!P || P.hp <= 0) return;
+      const isLow = P.hp <= 35;
+      const isCrit = P.hp <= 20;
+      P.hp -= d; P.lastHit = G.time;
+      const shakeAmt = isCrit ? 20 : isLow ? 14 : 7;
+      G.shake = Math.min(26, (G.shake || 0) + shakeAmt);
+      G.dmgFlash = isLow ? 1.6 : 1.0;
+      if (z) {
+        const hitAng = Math.atan2(P.y - z.y, P.x - z.x);
+        const jolt = isCrit ? 18 : isLow ? 13 : 7;
+        cam.rx = (cam.rx || 0) + Math.cos(hitAng) * jolt;
+        cam.ry = (cam.ry || 0) + Math.sin(hitAng) * jolt;
+      }
+      Snd.hurt();
+      const bloodCount = isCrit ? 14 : isLow ? 10 : 6;
+      for (let i = 0; i < bloodCount; i++) {
+        spawnPart(P.x, P.y, rand(0, TAU), rand(50, isLow ? 240 : 160), rand(.25, .55), rand(1.8, isLow ? 4 : 3), 'blood');
+      }
       if (P.hp <= 0) { P.hp = 0; gameOver(); }
     }
 
@@ -1512,8 +1554,10 @@
           else if (!def.auto) { mouse.queued = 0; }
         }
       }
-      // regen
-      if (P.hp < P.maxHp && G.time - P.lastHit > 5) P.hp = Math.min(P.maxHp, P.hp + 14 * dt);
+      // regen (only between waves during intermission, never during active combat)
+      if (G.mode === 'intermission' && P.hp < P.maxHp) {
+        P.hp = Math.min(P.maxHp, P.hp + 28 * dt);
+      }
     }
 
     /* =====================================================================
@@ -1551,8 +1595,20 @@
         const nd = Math.hypot(P.x - z.x, P.y - z.y);
         if (nd < reach && nd > 0) { z.x = P.x - (P.x - z.x) / nd * reach; z.y = P.y - (P.y - z.y) / nd * reach; }
         // attack
-        if (d < reach + 8 && z.atk <= 0 && z.emerge <= 0) { hurtPlayer(z.dmg); z.atk = .85; }
+        if (d < reach + 8 && z.atk <= 0 && z.emerge <= 0) { hurtPlayer(z.dmg, z); z.atk = .85; }
         if (z.groanT <= 0) { z.groanT = rand(3, 8); const v = 1 - clamp(d / 800, 0, 1); if (v > .05) Snd.groan(v); }
+      }
+      if (P && P.hp > 0 && P.hp <= 35) {
+        let inContact = 0;
+        for (const z of zombies) {
+          if (z.emerge <= 0 && Math.hypot(P.x - z.x, P.y - z.y) < z.r + P.r + 12) {
+            inContact++;
+          }
+        }
+        if (inContact > 0) {
+          const lowIntensity = (35 - Math.max(0, P.hp)) / 35 * 4.5 + Math.min(inContact * 2, 6);
+          G.shake = Math.max(G.shake || 0, lowIntensity);
+        }
       }
       // separation
       for (let i = 0; i < zombies.length; i++) {
@@ -1685,7 +1741,14 @@
     function simActive() { return (G.mode === 'playing' || G.mode === 'intermission') && !ui.open; }
     function update(dt) {
       G.time += dt;
-      G.shake = Math.max(0, G.shake - dt * 28); G.dmgFlash = Math.max(0, G.dmgFlash - dt * 2.2); G.flash = Math.max(0, (G.flash || 0) - dt * 1.6);
+      G.shake = (G.shake || 0) * Math.exp(-10 * dt);
+      if (G.shake < 0.05) G.shake = 0;
+      cam.rx = (cam.rx || 0) * Math.exp(-15 * dt);
+      cam.ry = (cam.ry || 0) * Math.exp(-15 * dt);
+      if (Math.abs(cam.rx) < 0.05) cam.rx = 0;
+      if (Math.abs(cam.ry) < 0.05) cam.ry = 0;
+      G.dmgFlash = Math.max(0, G.dmgFlash - dt * 2.2);
+      G.flash = Math.max(0, (G.flash || 0) - dt * 1.6);
       updatePlayer(dt);
       if (G.mode === 'playing') {
         updateZombies(dt);
@@ -1776,7 +1839,7 @@
       const viewW = vw / zoom, viewH = vh / zoom;
 
       if (G.mode === 'menu') {
-        G.menuT += dt;
+        G.menuT = (G.menuT || 0) + dt;
         cam.x = WW / 2 - viewW / 2 + Math.sin(G.menuT * .08) * 380; cam.y = WH / 2 - viewH / 2 + Math.cos(G.menuT * .06) * 160;
       } else if (P) {
         const lookX = (mouse.x - vw / 2) / zoom * .18, lookY = (mouse.y - vh / 2) / zoom * .18;
@@ -1785,8 +1848,10 @@
       }
       cam.x = viewW >= WW ? (WW - viewW) / 2 : clamp(cam.x, 0, WW - viewW);
       cam.y = viewH >= WH ? (WH - viewH) / 2 : clamp(cam.y, 0, WH - viewH);
-      const sh = (G.shake || 0) * (REDUCE_MOTION ? .2 : 1);
-      const ox = sh ? rand(-sh, sh) : 0, oy = sh ? rand(-sh, sh) : 0;
+      const sh = (G.mode !== 'menu' && !ui.open ? (G.shake || 0) : 0) * (REDUCE_MOTION ? .5 : 1);
+      const rx = G.mode !== 'menu' && !ui.open ? (cam.rx || 0) : 0;
+      const ry = G.mode !== 'menu' && !ui.open ? (cam.ry || 0) : 0;
+      const ox = (sh ? rand(-sh, sh) : 0) + rx, oy = (sh ? rand(-sh, sh) : 0) + ry;
       const s = dpr * zoom;
       ctx.setTransform(s, 0, 0, s, (-cam.x + ox) * s, (-cam.y + oy) * s);
       ctx.imageSmoothingEnabled = true;
@@ -1824,11 +1889,39 @@
       // ---------- screen space ----------
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (G.mode !== 'menu' && P) {
-        // light falloff around the player
-        const px = (P.x - cam.x) * zoom, py = (P.y - cam.y) * zoom;
-        const g = ctx.createRadialGradient(px, py, 240 * zoom, px, py, Math.max(vw, vh) * .78);
-        g.addColorStop(0, 'rgba(8,9,8,0)'); g.addColorStop(1, 'rgba(8,9,8,.6)');
-        ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
+        // light falloff around the player (intensified flashlight effect)
+        const px = (P.x - cam.x + ox) * zoom, py = (P.y - cam.y + oy) * zoom;
+        const flashBoost = (P.flash > 0 ? 50 : 0) * zoom;
+
+        // subtle warm incandescent center pool
+        const glow = ctx.createRadialGradient(px, py, 0, px, py, (220 * zoom) + flashBoost);
+        glow.addColorStop(0, 'rgba(235,225,195,.10)');
+        glow.addColorStop(0.55, 'rgba(235,225,195,.04)');
+        glow.addColorStop(1, 'rgba(235,225,195,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, vw, vh);
+
+        // subtle forward flashlight beam projected in aim direction
+        const aimDist = 120 * zoom;
+        const fx = px + Math.cos(P.angle) * aimDist, fy = py + Math.sin(P.angle) * aimDist;
+        const beam = ctx.createRadialGradient(fx, fy, 10 * zoom, fx, fy, 260 * zoom + flashBoost);
+        beam.addColorStop(0, 'rgba(235,225,195,.08)');
+        beam.addColorStop(0.65, 'rgba(235,225,195,.02)');
+        beam.addColorStop(1, 'rgba(235,225,195,0)');
+        ctx.fillStyle = beam;
+        ctx.fillRect(0, 0, vw, vh);
+
+        // deepened dark vignette falloff
+        const innerR = (130 * zoom) + flashBoost;
+        const outerR = Math.max(vw, vh) * .74;
+        const g = ctx.createRadialGradient(px, py, innerR, px, py, outerR);
+        g.addColorStop(0, 'rgba(6,7,6,0)');
+        g.addColorStop(0.25, 'rgba(6,7,6,.28)');
+        g.addColorStop(0.55, 'rgba(6,7,6,.68)');
+        g.addColorStop(0.82, 'rgba(6,7,6,.82)');
+        g.addColorStop(1, 'rgba(6,7,6,.88)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, vw, vh);
         // damage / low-health vignette
         const low = P.hp < 35 ? (35 - P.hp) / 35 * .35 : 0, da = Math.max(G.dmgFlash * .45, low);
         if (da > .01) {
@@ -1909,7 +2002,10 @@
       setHtml('powerups', pu);
       const hint = $('#hint'), showHint = G.mode === 'intermission' && !ui.open;
       hint.classList.toggle('hidden', !showHint);
-      if (showHint) setText('hint', 'Wave cleared! Next wave starts soon (or press Enter) · Press B for Upgrades');
+      if (showHint) {
+        const regenMsg = P.hp < P.maxHp ? 'Health regenerating… ' : 'Wave cleared! ';
+        setText('hint', regenMsg + 'Next wave starts soon (or press Enter) · Press B for Upgrades');
+      }
     }
     let bannerTimer = 0, toastTimer = 0;
     function showBanner(t, s) {
@@ -1931,7 +2027,22 @@
     }
     function updateCursor() { canvas.style.cursor = (!ui.open && (G.mode === 'playing' || G.mode === 'intermission')) ? 'none' : 'default'; }
 
-    function openPause() { if (simActive()) showOverlay('pause'); }
+    function openPause() {
+      if (simActive()) {
+        const acc = G.shots ? Math.round(G.hits / G.shots * 100) : 0;
+        $('#pause-stats').innerHTML =
+          `<div class="stat"><b>${fmt(G.score)}</b><span>Score</span></div>` +
+          `<div class="stat"><b>${Wv ? Wv.n : 1}</b><span>Wave</span></div>` +
+          `<div class="stat"><b>${fmt(G.kills)}</b><span>Kills</span></div>` +
+          `<div class="stat"><b>${Math.min(acc, 100)}%</b><span>Accuracy</span></div>`;
+        $('#pause-name').value = store.get('holdout_name') || $('#name-in').value || '';
+        $('#pause-submit-btn').disabled = false;
+        $('#pause-submit-btn').textContent = 'Stop & Submit Run';
+        $('#pause-submit-status').textContent = '';
+        $('#pause-submit-status').className = 'status';
+        showOverlay('pause');
+      }
+    }
     function openShop() {
       if (G.mode !== 'playing' && G.mode !== 'intermission') return;
       mouse.down = false;
@@ -2168,6 +2279,58 @@
       }
     }
 
+    async function submitFromPause() {
+      if (G.submitted) return;
+      const name = cleanName($('#pause-name').value || $('#name-in').value);
+      store.set('holdout_name', name);
+      $('#name-in').value = name;
+      $('#over-name').value = name;
+
+      const st = $('#pause-submit-status'), btn = $('#pause-submit-btn');
+      btn.disabled = true;
+      st.className = 'status';
+      st.textContent = 'Submitting run…';
+
+      // Conclude the active simulation cleanly
+      G.mode = 'gameover';
+      G.shake = 0; G.dmgFlash = 0; G.flash = 0;
+      cam.rx = 0; cam.ry = 0;
+      mouse.down = false;
+
+      const acc = G.shots ? Math.round(G.hits / G.shots * 100) : 0;
+      $('#over-title').textContent = 'Run ended · Wave ' + (Wv ? Wv.n : 1);
+      $('#over-stats').innerHTML =
+        `<div class="stat"><b>${fmt(G.score)}</b><span>Score</span></div><div class="stat"><b>${Wv ? Wv.n : 1}</b><span>Wave reached</span></div>` +
+        `<div class="stat"><b>${fmt(G.kills)}</b><span>Zombies killed</span></div><div class="stat"><b>${Math.min(acc, 100)}%</b><span>Hits per shot</span></div>`;
+
+      const entry = { name, score: Math.round(G.score), wave: Wv ? Wv.n : 1, kills: G.kills };
+      showOverlay('over');
+      loadBoard('#over-lb', entry);
+
+      const overBtn = $('#submit-btn'), overSt = $('#submit-status');
+      overBtn.disabled = true;
+      overSt.className = 'status';
+      overSt.textContent = 'Submitting…';
+
+      try {
+        const res = await LB.submit(entry);
+        G.submitted = true;
+        overSt.className = 'status ok';
+        if (res.updated === false) {
+          overSt.textContent = 'Your personal best of ' + fmt(res.best) + ' points is already on the leaderboard.';
+          overBtn.textContent = 'High score kept';
+        } else {
+          overSt.textContent = res.local ? 'Saved on this device. Connect Supabase to share scores with everyone.' : (res.isNewBest ? 'New personal best submitted!' : 'Score submitted.');
+          overBtn.textContent = 'Submitted';
+        }
+        loadBoard('#over-lb', entry);
+      } catch (err) {
+        overSt.className = 'status err';
+        overSt.textContent = (err.message || 'Could not submit.') + ' Try again.';
+        overBtn.disabled = false;
+      }
+    }
+
     /* =====================================================================
        Input
        ===================================================================== */
@@ -2177,6 +2340,7 @@
         if (e.key === 'Enter') {
           if (ui.open === 'over') { e.preventDefault(); submitScore(); }
           else if (ui.open === 'menu') { e.preventDefault(); beginGame(); }
+          else if (ui.open === 'pause') { e.preventDefault(); submitFromPause(); }
         }
         return;
       }
@@ -2236,7 +2400,17 @@
         case 'lb-close': showOverlay('menu'); break;
         case 'mute': Snd.setMuted(!Snd.muted); $('#mute-btn').textContent = 'Sound: ' + (Snd.muted ? 'off' : 'on'); break;
         case 'resume': showOverlay(null); break;
-        case 'quit': G.mode = 'menu'; showOverlay('menu'); break;
+        case 'submit-pause': submitFromPause(); break;
+        case 'quit':
+          G.mode = 'menu';
+          G.shake = 0;
+          G.dmgFlash = 0;
+          G.flash = 0;
+          cam.rx = 0;
+          cam.ry = 0;
+          P = null;
+          showOverlay('menu');
+          break;
         case 'open-shop':
           if (ui.open === 'shop') closeShop();
           else openShop();
@@ -2269,7 +2443,25 @@
     let lastT = performance.now();
     function frame(now) {
       const dt = Math.min(.05, (now - lastT) / 1000); lastT = now;
-      if (simActive()) update(dt);
+      if (simActive()) {
+        update(dt);
+      } else {
+        if (ui.open === 'shop' && G.mode === 'intermission' && P && P.hp < P.maxHp) {
+          P.hp = Math.min(P.maxHp, P.hp + 28 * dt);
+        }
+        if (G.shake > 0) {
+          G.shake = (G.shake || 0) * Math.exp(-10 * dt);
+          if (G.shake < 0.05) G.shake = 0;
+        }
+        if (cam.rx || cam.ry) {
+          cam.rx = (cam.rx || 0) * Math.exp(-15 * dt);
+          cam.ry = (cam.ry || 0) * Math.exp(-15 * dt);
+          if (Math.abs(cam.rx) < 0.05) cam.rx = 0;
+          if (Math.abs(cam.ry) < 0.05) cam.ry = 0;
+        }
+        if (G.dmgFlash > 0) G.dmgFlash = Math.max(0, G.dmgFlash - dt * 2.2);
+        if (G.flash > 0) G.flash = Math.max(0, (G.flash || 0) - dt * 1.6);
+      }
       render(dt);
       updateHud();
       requestAnimationFrame(frame);
