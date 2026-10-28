@@ -4,16 +4,16 @@ A top-down wave-based zombie survival shooter built with vanilla **HTML5 Canvas*
 
 ---
 
-## 🎮 Play Directly in Your Browser
+## Play Directly in Your Browser
 
-🔗 **Live Game:** **[https://akulsun.github.io/holdout/](https://akulsun.github.io/holdout/)**
+**Live Game:** **[https://akulsun.github.io/holdout/](https://akulsun.github.io/holdout/)**
 
 - **Zero dependencies & no build step**: Open the website in any modern web browser (Chrome, Firefox, Edge, Safari, Brave) to play instantly.
 - **Audio out of the box**: All sound effects (gunfire, reloads, impacts, zombie roars) are synthesized on the fly via the Web Audio API—no external audio files or assets needed.
 
 ---
 
-## 🕹️ Controls
+## Controls
 
 | Action | Control |
 | :--- | :--- |
@@ -21,13 +21,13 @@ A top-down wave-based zombie survival shooter built with vanilla **HTML5 Canvas*
 | **Aim & Shoot** | Mouse (Left Click to Fire) |
 | **Reload** | <kbd>R</kbd> |
 | **Switch Weapon** | <kbd>1</kbd> – <kbd>5</kbd> or Mouse Scroll Wheel |
-| **Armory & Upgrades** | <kbd>B</kbd> or the on-screen **⚡ Upgrades** button |
+| **Armory & Upgrades** | <kbd>B</kbd> or the on-screen **Upgrades** button |
 | **Skip Intermission** | <kbd>Enter</kbd> (starts next wave immediately) |
 | **Pause / Close Menus** | <kbd>Esc</kbd> |
 
 ---
 
-## ⚔️ Weapons & Armory
+## Weapons & Armory
 
 Open the **Armory & Upgrades** screen anytime (<kbd>B</kbd> or on-screen button) to purchase new weapons, upgrade tracks up to Level 5, buy ammo refills, or enhance survivor stats.
 
@@ -51,7 +51,7 @@ Open the **Armory & Upgrades** screen anytime (<kbd>B</kbd> or on-screen button)
 
 ---
 
-## 🧟 Enemy Types
+## Enemy Types
 
 - **Walker**: Standard infected. Slow-moving in early waves, increases in numbers and aggression.
 - **Runner**: Fast, agile rusher designed to flank and overwhelm you.
@@ -60,7 +60,7 @@ Open the **Armory & Upgrades** screen anytime (<kbd>B</kbd> or on-screen button)
 
 ---
 
-## 🎁 Power-Up Drops
+## Power-Up Drops
 
 Zombies occasionally drop temporary tactical power-ups:
 - **Max Ammo (`A`)**: Instantly refills all weapon magazines and reserves.
@@ -71,13 +71,13 @@ Zombies occasionally drop temporary tactical power-ups:
 
 ---
 
-## 🏆 Global Leaderboard (Supabase Setup)
+## Global Leaderboard (Supabase Setup)
 
 The game features an online global leaderboard powered by **Supabase**. If Supabase credentials are not configured, it seamlessly falls back to saving scores locally in your browser's `localStorage`.
 
 ---
 
-## 🎨 Custom Sprites (Optional)
+## Custom Sprites (Optional)
 
 The game comes with custom procedural canvas drawing for player and zombie models. If you prefer to use PNG sprite sheets (such as Kenney's CC0 *Topdown Shooter* pack), you can link them in the `SPRITES` configuration at the top of the script in `index.html`:
 
@@ -94,7 +94,7 @@ const SPRITES = {
 
 ---
 
-## 🛠️ Tech Stack & Implementation Details
+## Tech Stack & Implementation Details
 
 - **HTML5 Canvas (2D Context)**: Dynamic camera tracking, particle gore system, obstacle collision detection, radial light vignettes, and custom HUD overlays.
 - **Web Audio API**: Real-time sound synthesis with oscillators, white noise buffers, biquad lowpass/bandpass filters, and frequency ramps.
